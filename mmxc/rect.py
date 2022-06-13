@@ -1,4 +1,5 @@
 from decimal import Decimal
+import decimal
 import math
 
 """ 地区范围相关, 网格操作函数 """
@@ -142,3 +143,50 @@ def wgs84_rect_to_gcj02_rect(wgs84_rect):
 
 
 
+def map_to_grid_left_top(left_top_rect, grid_size, point):
+
+    left_top = (Decimal(left_top_rect[0][0]), Decimal(left_top_rect[0][1]))
+
+    lng = Decimal(point[0])
+    lat = Decimal(point[1])
+
+    lng_size = Decimal(grid_size[0])
+    lat_size = Decimal(grid_size[1])
+
+    lng_diff = lng - left_top[0]
+    lat_diff = left_top[1] - lat
+
+    w = lng_diff / lng_size
+    h = lat_diff / lat_size
+
+    w = w.quantize(Decimal('0'), rounding=decimal.ROUND_FLOOR)
+    h = h.quantize(Decimal('0'), rounding=decimal.ROUND_FLOOR)
+
+    lng = left_top[0] + lng_size*w
+    lat = left_top[1] - lat_size*h
+
+    return (str(lng), str(lat)) 
+
+
+def cut_rect_grid(top_bot_rect, step=None):
+    left_top = top_bot_rect[RECT_LEFT_TOP]
+    right_bot = top_bot_rect[RECT_RIGHT_BOT]
+
+    bot_lat = decimal.Decimal(right_bot[Y])
+    left_lng = decimal.Decimal(left_top[X])
+    top_lat = decimal.Decimal(left_top[Y])
+    right_lng = decimal.Decimal(right_bot[X])
+
+    lng_diff = decimal.Decimal(step[0])
+    lat_diff = decimal.Decimal(step[1])
+
+    end_x = right_lng
+    end_y = bot_lat
+
+    y = top_lat
+    while y > end_y:
+        x = left_lng
+        while x < end_x:
+            yield [(str(x), str(y)), (str(x + lng_diff), str(y - lat_diff))]
+            x = x + lng_diff 
+        y = y - lat_diff
