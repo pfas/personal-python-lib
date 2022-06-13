@@ -14,9 +14,9 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'mmxc'
 DESCRIPTION = 'personal python lib stored in pypi'
-URL = 'https://github.com/'
+URL = 'https://github.com/pfas/personal-python-lib'
 EMAIL = 'linfusheng95@qq.com'
-AUTHOR = 'Awesome Soul'
+AUTHOR = 'pfas'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1.0'
 
