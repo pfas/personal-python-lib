@@ -18,7 +18,7 @@ URL = 'https://github.com/pfas/personal-python-lib'
 EMAIL = 'linfusheng95@qq.com'
 AUTHOR = 'pfas'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.0'
+VERSION = '0.1.3'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

@@ -45,19 +45,22 @@ def range_width(top_bot_rect, w: str):
     """
     return width pixel points of rect if the width of pixel point is w
     """
-    width_len = Decimal(top_bot_rect[RECT_RIGHT_TOP][X]) - Decimal(top_bot_rect[RECT_LEFT_BOT][X])
+    width_len = Decimal(top_bot_rect[RECT_RIGHT_BOT][X]) - Decimal(top_bot_rect[RECT_LEFT_TOP][X])
     width = width_len / Decimal(w)
-    return str(width.quantize(Decimal('0')))
+    return int(width.quantize(Decimal('0')))
 
 
 def range_height(top_bot_rect, h: str):
     """
     return height pixel points of rect if the height of pixel point is h
     """
-    height_len = Decimal(top_bot_rect[RECT_RIGHT_TOP][Y]) - Decimal(top_bot_rect[RECT_LEFT_BOT][Y])
+    height_len = Decimal(top_bot_rect[RECT_LEFT_TOP][Y]) - Decimal(top_bot_rect[RECT_RIGHT_BOT][Y])
     height = height_len / Decimal(h)
-    return str(height.quantize(Decimal('0')))
+    return int(height.quantize(Decimal('0')))
 
+
+def rect_size(top_bot_rect, size):
+    return (range_width(top_bot_rect, size[0]), range_height(top_bot_rect, size[1]))
 
 def bot_top_rect2top_bot_rect(bot_top_rect):
     """
@@ -86,7 +89,7 @@ def float_str_precision(s: str, precision='0.000000'):
 
 
 def point_precision(point, precision='0.000000'):
-    return (float_str_precision(point[0]), float_str_precision(point[1]))
+    return (float_str_precision(point[0], precision), float_str_precision(point[1], precision))
 
 
 def wgs84_to_gcj02(lng, lat):
@@ -190,3 +193,49 @@ def cut_rect_grid(top_bot_rect, step=None):
             yield [(str(x), str(y)), (str(x + lng_diff), str(y - lat_diff))]
             x = x + lng_diff 
         y = y - lat_diff
+
+def grid_index(top_bot_rect, size, grid):
+
+    b_left_top = top_bot_rect[RECT_LEFT_TOP]
+    g_left_top = grid[RECT_LEFT_TOP]
+
+    blat = decimal.Decimal(b_left_top[Y])
+    blng = decimal.Decimal(b_left_top[X])
+    
+    glat = decimal.Decimal(g_left_top[Y])
+    glng = decimal.Decimal(g_left_top[X])
+
+
+    lng_diff = decimal.Decimal(size[0])
+    lat_diff = decimal.Decimal(size[1])
+
+    w = ((glng - blng) / lng_diff).quantize(Decimal('0'))
+    h = ((blat - glat) / lat_diff).quantize(Decimal('0'))
+
+    return (int(w), int(h))
+
+
+def grid_by_index(top_bot_rect, size, index):
+
+    b_left_top = top_bot_rect[RECT_LEFT_TOP]
+    
+    w = Decimal(index[0])
+    h = Decimal(index[1])
+
+    lng_diff = decimal.Decimal(size[0])
+    lat_diff = decimal.Decimal(size[1])
+
+    blat = decimal.Decimal(b_left_top[Y])
+    blng = decimal.Decimal(b_left_top[X])
+    
+    glat = blat - h*lat_diff
+    glng = blng + w*lng_diff
+
+    return [point_precision((glng, glat), '0.00'), point_precision((glng + lng_diff, glat - lat_diff), '0.00')]
+
+
+# box = [('113.70', '31.37'), ('115.09', '29.96')]
+# size = ('0.01', '0.01')
+
+# print(grid_by_index(box, size, (1,0)))
+
